@@ -49,27 +49,27 @@ class QuestionColb(models.Model):
     text = models.CharField(max_length=124, blank = False, null = False)    
     ranking = models.IntegerField( default=0, null = True) 
     created_at = models.DateTimeField(auto_now_add=True)
+    options = models.ManyToManyField('OptionCard')
 
     def __str__(self):
         return self.text
 
-class OptionColb(models.Model):    
-    text = models.CharField(max_length=64, blank = False, null = False)
-    question = models.ForeignKey('QuestionColb', on_delete=models.CASCADE)
-    axis = models.CharField(max_length=10, choices = axis.choices())     
-    created_at = models.DateTimeField(auto_now_add=True)
+# class OptionColb(models.Model):    
+#     text = models.CharField(max_length=64, blank = False, null = False)
+#     question = models.ForeignKey('QuestionColb', on_delete=models.CASCADE)
+#     axis = models.CharField(max_length=10, choices = axis.choices())     
+#     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return str (self.question) + " - " + self.text
+#     def __str__(self):
+#         return str (self.question) + " - " + self.text
 
 class TestColb(models.Model):    
     question = models.ForeignKey('QuestionColb', on_delete=models.CASCADE,)
     user = models.ForeignKey('Alumno', on_delete=models.CASCADE,)
-    axis_obs = models.PositiveSmallIntegerField(default=0)
-    axis_abst = models.PositiveSmallIntegerField(default=0)
-    axis_exp_act = models.PositiveSmallIntegerField(default=0)
-    axis_exp_con = models.PositiveSmallIntegerField(default=0)
-
+    affi_divergente = models.PositiveSmallIntegerField(default=0)
+    affi_asimilador = models.PositiveSmallIntegerField(default=0)
+    affi_convergente = models.PositiveSmallIntegerField(default=0)
+    affi_acomodador = models.PositiveSmallIntegerField(default=0)
     def __str__(self):
         return str (self.user)
 
@@ -78,6 +78,7 @@ class OptionCard(models.Model):
     text = models.CharField(max_length=124, blank = False, null = False)
     type_moment = models.CharField(max_length=12, choices = typeMoment.choices()) 
     file_name = models.CharField(max_length=150, default='')
+    img_url=models.URLField(max_length=150, null = True)
     file = models.ImageField(upload_to=upload_to)
     folder = models.CharField(max_length=150, default='general')
     created_at = models.DateTimeField(auto_now_add=True)

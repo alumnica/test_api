@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import TestColb, TestCard, QuestionColb, Alumno, OptionCard, ParCard, typeMoment
-from .serializers import ColbSerializer, QuestionColbSerializer, OptionColbSerializer,\
+from .serializers import ColbSerializer, QuestionColbSerializer,\
                     ParCardSerializer, OptionCardSerializer, CardSerializer
 import itertools
 from rest_framework.response import Response
 from rest_framework import  status
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from collections import OrderedDict
 # Create your views here.
 
 
@@ -27,19 +28,35 @@ class TestColbView(APIView):
     def get_object(self, id_user):
         try:
             return TestColb.objects.get(user=id_user)
-
         except ObjectDoesNotExist:
             print ('se crea')
             return self.create_test(id_user)
 
+    def parse_out (self, data):
+        print (data)
+        out_request = dict(data)        
+        out_request['question'] = dict(data['question'])
+        out_request['question']['options']={}
+        for option in data['question'].get('options'):            
+            out_request['question']['options'][option.get('id')] = dict (option)            
+            out_request ['question']['options'][option.get('id')]['current_card'] = False            
+        return out_request
+
+
+    def parse_in (self, data):
+        in_request = dict(data)
+        options = []
+        for option in data['question']['options'].values():            
+            options.append(option)            
+        in_request['question']['options'] = options
+        return in_request
+
+
     def get(self, request,  id_user, format=None):
         try:
-            print ('in get colb')
-            print (id_user)
             test_colb = self.get_object(id_user)
-            print (test_colb)
             serializer = ColbSerializer(test_colb)            
-            return Response(serializer.data,status=status.HTTP_200_OK)
+            return Response( self.parse_out (serializer.data), status=status.HTTP_200_OK)
         except Exception as err:
             print (err)
             return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -49,7 +66,7 @@ class TestColbView(APIView):
         try:
             print ('in put colb')            
             test_colb = self.get_object(id_user)
-            serializer = ColbSerializer(test_colb, data=request.data)            
+            serializer = ColbSerializer(test_colb, self.parse_in(data=request.data))
             if serializer.is_valid():
                 serializer.save()                
                 return Response({},status=status.HTTP_200_OK)
@@ -67,10 +84,7 @@ class TestCardView(APIView):
     """
 
     def create_set(self, pares_keys, test_card):
-        #pares = []   
-        print ('create set')     
         for par_key in pares_keys:
-            print (par_key)
             par_card = ParCard( test=test_card)
             par_card.save()
             par_card.options.add(OptionCard.objects.get(type_moment=par_key[0]))
@@ -80,22 +94,13 @@ class TestCardView(APIView):
 
 
 
-
     def validate_draws (self, tuplas, test_card, afinnities_saved=[]):
-        
         draws = []
-        
         if 4 in afinnities_saved :
             max_affi = max(afinnities_saved) - 1 
         else:
             max_affi = 4
-            
-        print ('.....................')
-        print (afinnities_saved)
-        print (max_affi)
-        print (tuplas)
-        for i in  range (len(tuplas) ): 
-            print (i, tuplas[i], max_affi)       
+        for i in  range (len(tuplas) ):             
             if i == 0 and not tuplas[i][1] == tuplas[i+1][1]:
                 setattr(test_card, 'affi_' + tuplas[i][0], max_affi)  
                 max_affi = max_affi - 1
@@ -111,8 +116,7 @@ class TestCardView(APIView):
                 draws.append(tuplas[i][0])                
                 max_affi = max_affi - 1
         
-        test_card.save() 
-        
+        test_card.save()         
         return draws
         
 
@@ -122,8 +126,7 @@ class TestCardView(APIView):
         values = [e.value for e in typeMoment]
         afinnities = []
         for v in values:
-            affi_moment = getattr (test_card, 'affi_' + v)   
-            print (affi_moment)         
+            affi_moment = getattr (test_card, 'affi_' + v)               
             if affi_moment ==0 :
                 responses [v]=0 
             else:
@@ -158,37 +161,58 @@ class TestCardView(APIView):
         try:
             return TestCard.objects.get(user=id_user)
         except ObjectDoesNotExist: 
-            print ('no existe')
             return self.create_test(id_user)
+
+    def parse_out (self, data):
+        out_request = {'user': data['user']}
+        for par in data['pares']:
+            out_request [par.get('id')] = dict (par)
+            out_request [par.get('id')]['options'] = {}
+            out_request [par.get('id')]['current_pair'] = False
+            for option in par.get('options'):                
+                out_request [par.get('id')]['options'][option.get('id')] = dict(option)
+        return out_request
+
+
+    def parse_in (self, data):
+        in_request = {'user': data.pop('user')}        
+        pares = []
+        for par in data.values():
+            options = []
+            for option in par['options'].values():
+                options.append(option)
+            par['options'] = options    
+            pares.append (par)
+        in_request ['pares'] = pares
+        return in_request
+
 
     def get(self, request,  id_user, format=None):
         try:
             print ('in get card')
             test_colb = self.get_object(id_user)
-            serializer = CardSerializer(test_colb)            
-            return Response(serializer.data,status=status.HTTP_200_OK)
+            serializer = CardSerializer(test_colb) 
+            print (serializer.data)           
+            return Response(self.parse_out(serializer.data),status=status.HTTP_200_OK)
         except Exception as err:
             print (err)
             return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
     def put(self, request,  id_user, format=None):
-        #try:            
+        try:            
         
-        test_colb = self.get_object(id_user)
-        serializer = CardSerializer(test_colb, data=request.data)
-        
-        if serializer.is_valid():            
-            test = serializer.save()
-            new_set = self.evaluate_test(test)
-                        
-            if  new_set != []:
-                serializer = CardSerializer(test_colb)            
-                return Response(serializer.data,status=status.HTTP_200_OK)
-            print ('No hay empates ')
-            return Response({},status=status.HTTP_200_OK)
-        return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
-        # except Exception as err:
-        #     print (err)
-        #     return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            test_colb = self.get_object(id_user)
+            serializer = CardSerializer(test_colb, self.parse_in(data=request.data))
+            if serializer.is_valid():            
+                test = serializer.save()
+                new_set = self.evaluate_test(test)
+                if  new_set != []:
+                    serializer = CardSerializer(test_colb)            
+                    return Response(self.parse_out( serializer.data),status=status.HTTP_200_OK)
+                return Response({},status=status.HTTP_200_OK)
+            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+        except Exception as err:
+             print (err)
+             return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
