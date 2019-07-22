@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework import  status
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from collections import OrderedDict
+import traceback 
 # Create your views here.
 
 
@@ -54,11 +55,12 @@ class TestColbView(APIView):
 
     def get(self, request,  id_user, format=None):
         try:
+            
             test_colb = self.get_object(id_user)
             serializer = ColbSerializer(test_colb)            
             return Response( self.parse_out (serializer.data), status=status.HTTP_200_OK)
         except Exception as err:
-            print (err)
+            print (traceback.format_exc())            
             return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -71,9 +73,8 @@ class TestColbView(APIView):
                 serializer.save()                
                 return Response({},status=status.HTTP_200_OK)
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
-        except Exception as err:
-            print (serializer.data)
-            print (err)
+        except Exception as err:            
+            print (traceback.format_exc())
             return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -195,7 +196,7 @@ class TestCardView(APIView):
             print (serializer.data)           
             return Response(self.parse_out(serializer.data),status=status.HTTP_200_OK)
         except Exception as err:
-            print (err)
+            print (traceback.format_exc())
             return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -213,6 +214,6 @@ class TestCardView(APIView):
                 return Response({},status=status.HTTP_200_OK)
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
         except Exception as err:
-             print (err)
+             print (traceback.format_exc())
              return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
