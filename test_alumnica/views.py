@@ -40,7 +40,7 @@ class TestColbView(APIView):
         out_request['question']['options']={}
         for option in data['question'].get('options'):            
             out_request['question']['options'][option.get('id')] = dict (option)            
-            out_request ['question']['options'][option.get('id')]['current_card'] = False            
+            out_request ['question']['options'][option.get('id')]['selected_order'] = None
         return out_request
 
 
