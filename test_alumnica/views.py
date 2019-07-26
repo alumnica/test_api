@@ -166,19 +166,22 @@ class TestCardView(APIView):
 
     def parse_out (self, data):
         out_request = {'user': data['user']}
+        out_request['pares'] = {}
         for par in data['pares']:
-            out_request [par.get('id')] = dict (par)
-            out_request [par.get('id')]['options'] = {}
-            out_request [par.get('id')]['current_pair'] = False
+
+            out_request['pares'] [par.get('id')] = dict (par)
+            out_request['pares'] [par.get('id')]['options'] = {}
+            out_request ['pares'][par.get('id')]['current_pair'] = False
             for option in par.get('options'):                
-                out_request [par.get('id')]['options'][option.get('id')] = dict(option)
+                out_request ['pares'][par.get('id')]['options'][option.get('id')] = dict(option)
         return out_request
 
 
     def parse_in (self, data):
         in_request = {'user': data.pop('user')}        
+        pares_in = data.pop('pares')
         pares = []
-        for par in data.values():
+        for par in pares_in.values():
             options = []
             for option in par['options'].values():
                 options.append(option)
