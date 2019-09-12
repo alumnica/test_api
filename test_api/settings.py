@@ -54,7 +54,7 @@ MIDDLEWARE = [
     
 ]
 
-CORS_ORIGIN_ALLOW_ALL=True
+#CORS_ORIGIN_ALLOW_ALL=True
 
 # CORS_ALLOW_METHODS = [
 #     'DELETE',
@@ -77,9 +77,9 @@ CORS_ORIGIN_ALLOW_ALL=True
 #     'x-requested-with',
 # ]
 
-#CORS_ORIGIN_WHITELIST = (
- #   'http://localhost:3000',
-#)
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:3000',
+)
 
 ROOT_URLCONF = 'test_api.urls'
 
@@ -151,3 +151,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
