@@ -198,8 +198,7 @@ class TestCardView(APIView):
 
 
     def put(self, request,  id_user, format=None):
-        try:            
-        
+        try:                    
             test_colb = self.get_object(id_user)
             serializer = CardSerializer(test_colb, self.parse_in(data=request.data))
             if serializer.is_valid():            
@@ -211,8 +210,8 @@ class TestCardView(APIView):
                 return Response({},status=status.HTTP_200_OK)
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
         except Exception as err:
-             #print (traceback.format_exc())
-             return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            #print (traceback.format_exc())
+            return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
