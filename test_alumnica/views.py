@@ -57,7 +57,7 @@ class TestColbView(APIView):
             serializer = ColbSerializer(test_colb)            
             return Response( self.parse_out (serializer.data), status=status.HTTP_200_OK)
         except Exception as err:
-            print (traceback.format_exc())            
+            #print (traceback.format_exc())            
             return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -70,7 +70,7 @@ class TestColbView(APIView):
                 return Response({},status=status.HTTP_200_OK)
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
         except Exception as err:            
-            print (traceback.format_exc())
+            #print (traceback.format_exc())
             return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -193,7 +193,7 @@ class TestCardView(APIView):
             serializer = CardSerializer(test_colb) 
             return Response(self.parse_out(serializer.data),status=status.HTTP_200_OK)
         except Exception as err:
-            print (traceback.format_exc())
+            #print (traceback.format_exc())
             return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -211,7 +211,7 @@ class TestCardView(APIView):
                 return Response({},status=status.HTTP_200_OK)
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
         except Exception as err:
-             print (traceback.format_exc())
+             #print (traceback.format_exc())
              return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -336,7 +336,7 @@ class ParCardView(APIView):
             serializer = CardSerializer(test_card) 
             return Response(self.parse_out(serializer.data),status=status.HTTP_200_OK)
         except Exception as err:
-            print (traceback.format_exc())
+            #print (traceback.format_exc())
             return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -354,7 +354,7 @@ class ParCardView(APIView):
                 return Response({},status=status.HTTP_200_OK)
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
         except Exception as err:
-             print (traceback.format_exc())
-             return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            #print (traceback.format_exc())
+            return Response({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
