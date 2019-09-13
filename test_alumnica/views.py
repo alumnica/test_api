@@ -22,7 +22,6 @@ class TestColbView(APIView):
         user = Alumno.objects.get(pk=id_user)
         t = TestColb(question=question, user=user)
         t.save()
-        print (t)
         return t
 
 
@@ -30,11 +29,9 @@ class TestColbView(APIView):
         try:
             return TestColb.objects.get(user=id_user)
         except ObjectDoesNotExist:
-            print ('se crea')
             return self.create_test(id_user)
 
     def parse_out (self, data):
-        print (data)
         out_request = dict(data)        
         out_request['question'] = dict(data['question'])
         out_request['question']['options']={}
@@ -66,7 +63,6 @@ class TestColbView(APIView):
 
     def put(self, request,  id_user, format=None):
         try:
-            print ('in put colb')            
             test_colb = self.get_object(id_user)
             serializer = ColbSerializer(test_colb, self.parse_in(data=request.data))
             if serializer.is_valid():
@@ -193,10 +189,8 @@ class TestCardView(APIView):
 
     def get(self, request,  id_user, format=None):
         try:
-            print ('in get card')
             test_colb = self.get_object(id_user)
             serializer = CardSerializer(test_colb) 
-            print (serializer.data)           
             return Response(self.parse_out(serializer.data),status=status.HTTP_200_OK)
         except Exception as err:
             print (traceback.format_exc())
@@ -338,10 +332,8 @@ class ParCardView(APIView):
 
     def get(self, request,  id_user, format=None):
         try:
-            print ('in get card')
             test_card = self.get_object(id_user)
             serializer = CardSerializer(test_card) 
-            print (serializer.data)           
             return Response(self.parse_out(serializer.data),status=status.HTTP_200_OK)
         except Exception as err:
             print (traceback.format_exc())
